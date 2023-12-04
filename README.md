@@ -15,9 +15,9 @@ A desktop application that sends bulk messages on whatsapp. WhatsFlow is a highl
 
 
 ### APK Installation
-Download the latest APK file from the "Releases" section of the [Mosam GitHub repository](https://github.com/SidharthMudgil/mosam/releases).
+Download the latest software from here.
 
-[Download APK v6.0.0 (only for window 10 and 11)](https://drive.google.com/file/d/12Zi8O3Urlmr2aZ_ECcbC4TOWHdna8-x9/view?usp=sharing)
+[Download WhatsFlow v6.0.0 (only for window 10 and 11)](https://drive.google.com/file/d/12Zi8O3Urlmr2aZ_ECcbC4TOWHdna8-x9/view?usp=sharing)
 | -------------------------- |
 
 
@@ -38,6 +38,7 @@ pip install cutomtkinter selenium webdriver-manager get-chrome-driver
 v6.6.0 (only for windows 10 and 11)
 - Auto installation of compatible chrome webdriver
 - As chrome version updates, the driver version will also be updated automatically.
+
 v5.1.1
 - bugs fixed
 - Codebase algorithm changed, redundant codes removed
@@ -50,16 +51,20 @@ v5.1.1
 - No more waste of time to handle invalid numbers in sleep duration.
 - handles invalid numbers and non-link numbers and valid numbers as expected.
 - login time and other webdriverwait time increased to 5 minutes i.e. 300 seconds
+
 v4.1.0
 - No rush for scanning the QR code . You now get enough time to login.
+
 v3.0
 - Documents can also be sent besides image/video.
 - No copy pasting image/video/document path. Select your file right from the application.
 - Success/Failure status also visible in status bar.
+  
 v2.0
 - Photos/videos both can be sent.
 - Numbers not available on whatsapp will be bypassed automatically.
 - A simple UI is also designed, so no boring powershell required.
 - Text can also be bold or italic or both
+  
 v1.0
 - Initiated from [this Youtube video](https://youtu.be/hs1VCXBoXbU?si=EoZ4tMI5b_BJedPP)
