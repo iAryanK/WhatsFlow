@@ -5,7 +5,12 @@ from selenium import webdriver
 def install_driver():
     get_driver = GetChromeDriver()
 
-    with open('current_driver_version.txt', 'r+') as file:
+    filename = "current_driver_version.txt"
+    if not os.path.exists(filename):
+        with open(filename, 'w'):
+            pass
+
+    with open(filename, 'r+') as file:
         current_version = file.read()
         if (get_driver.stable_version()==current_version):
             return

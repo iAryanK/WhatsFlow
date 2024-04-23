@@ -80,13 +80,13 @@ def deleteChat(driver, num):
     receiver_number = num[-10:]
     receiver = "+91 " + receiver_number[0:5] + " " + receiver_number[5:]
     # verify_receiver = driver.find_element(By.CSS_SELECTOR, "span[data-testid='conversation-info-header-chat-title']")
-    verify_receiver = driver.find_element(By.CSS_SELECTOR, "._3W2ap ._11JPr")
+    verify_receiver = driver.find_element(By.CSS_SELECTOR, "._amig ._aou8 .x1iyjqo2")
     if ((verify_receiver.text != receiver) or (receiver_number == (self_number.get())[-10:])) :
         return
 
     # click on delete chat option
-    driver.find_element(By.CSS_SELECTOR, "._3vsRF ._3OtEr").click()
-    driver.find_element(By.CSS_SELECTOR, "div[aria-label='Delete chat']").click()
+    driver.find_element(By.CSS_SELECTOR, "div[data-icon='menu']").click()
+    driver.find_element(By.CSS_SELECTOR, 0).click()
 
     # click on continue button that appears sometimes
     # WebDriverWait(driver, 300).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "button[data-testid='popup-controls-ok']")))
@@ -97,14 +97,14 @@ def deleteChat(driver, num):
         time.sleep(0.5)
 
     # click on delete chat button
-    WebDriverWait(driver, 300).until(EC.visibility_of_element_located((By.CSS_SELECTOR, ".germ6ouh")))
-    delete_chat_button = driver.find_element(By.CSS_SELECTOR, ".szmswy5k .gndfcl4n .gndfcl4n")
+    WebDriverWait(driver, 300).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "div[aria-label='Delete this chat?']")))
+    delete_chat_button = driver.find_element(By.CSS_SELECTOR, ".x1k3x3db .x1c4vz4f .x3pnbk8")
     if(delete_chat_button.text == "Delete chat"):
         delete_chat_button.click()
-        WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.CLASS_NAME, '_64p9P')))
+        WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.CLASS_NAME, '_al_c')))
     else:
         # driver.find_element(By.CSS_SELECTOR, "button[data-testid='popup-controls-cancel']").click()
-        driver.find_element(By.CSS_SELECTOR, ".germ6ouh").click()
+        driver.find_element(By.CSS_SELECTOR, ".x1kwr8ib .x1c4vz4f .x3pnbk8").click()
     
 def sendMessage():
     if (phone_numbers_text.get("0.0", "end-1c") == phone_numbers_text_placeholder or len(phone_numbers_text.get("0.0", "end-1c")) == 0):
@@ -136,9 +136,9 @@ def sendMessage():
         driver = webdriver.Chrome()
         link = 'https://web.whatsapp.com'
         driver.get(link)
-        WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.CLASS_NAME, '_64p9P')))
+        WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.CLASS_NAME, '_al_c')))
     except:
-        driver.quit()
+        # driver.quit()
         jobvar.set("Something unusual occurred. Retry!")
         send_message_button.configure(state="normal")
         return
@@ -148,7 +148,8 @@ def sendMessage():
     num = (self_number.get())[-10:]
     link = f'https://web.whatsapp.com/send/?phone=91{num}'
     driver.get(link)
-    WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.CLASS_NAME, '_2au8k')))
+    # WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.CLASS_NAME, '_2au8k')))
+    WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.CSS_SELECTOR, "span[title='Message yourself']")))
 
     time.sleep(action_time)
 
@@ -171,14 +172,14 @@ def sendMessage():
 
                 # Wait for new chat page to load 
                 if (num[-10:] != (self_number.get())[-10:]) :
-                    WebDriverWait(driver, 300).until_not(EC.presence_of_element_located((By.CSS_SELECTOR, "._3W2ap .seopfc61.i539y0ga._11JPr")))
+                    WebDriverWait(driver, 300).until_not(EC.presence_of_element_located((By.CSS_SELECTOR, "span[title='Message yourself']")))
 
                 # Wait for type message box to appear before start typing the message 
-                WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.CLASS_NAME, '_2lryq')))
+                WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div[title='Type a message']")))
 
                 # Click on button to load the input DOM
                 if doc_path.get() != doc_placeholder and len(doc_path.get()) != 0 :
-                    attach_btn = driver.find_element(By.CSS_SELECTOR, '._1OT67')
+                    attach_btn = driver.find_element(By.CSS_SELECTOR, "span[data-icon='attach-menu-plus']")
                     attach_btn.click()
                     time.sleep(action_time)
                     # Find and send doc path to input
@@ -190,10 +191,11 @@ def sendMessage():
                     action_sendDoc = ActionChains(driver)
                     action_sendDoc.send_keys(Keys.ENTER)
                     action_sendDoc.perform()
+                    WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.CSS_SELECTOR, "span[data-icon='emoji-input']")))
 
                 # Click on button to load the input DOM
                 if image_path.get() != image_placeholder and len(image_path.get()) !=0 :
-                    attach_btn = driver.find_element(By.CSS_SELECTOR, '._1OT67')
+                    attach_btn = driver.find_element(By.CSS_SELECTOR, "span[data-icon='attach-menu-plus']")
                     attach_btn.click()
                     time.sleep(action_time)
                     # Find and send image path to input
@@ -229,8 +231,8 @@ def sendMessage():
 
             finally:
                 try:
-                    driver.find_element(By.CSS_SELECTOR, "._21S-L .seopfc61.i539y0ga._11JPr").click()
-                    WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.CSS_SELECTOR, "._3W2ap .seopfc61.i539y0ga._11JPr")))
+                    driver.find_element(By.CSS_SELECTOR, ".xjuopq5.xulcptl._ao3e").click()
+                    WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.CSS_SELECTOR, "span[title='Message yourself']")))
                 except:
                     driver.quit()
                     send_message_button.configure(state="normal")
