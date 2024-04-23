@@ -15,7 +15,7 @@ A desktop application that sends bulk messages on whatsapp. WhatsFlow is a highl
 
 ### APK Installation
 
-Download the latest software file from here.
+Download the latest software from here.
 
 [Download WhatsFlow v6.1.0 (only for window 10 and 11)](https://drive.google.com/file/d/1Ymv3Fs45KQddAuDMJe4cekpXKgm5DVSl/view?usp=sharing)
 | -------------------------- |
