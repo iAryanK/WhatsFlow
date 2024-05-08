@@ -12,6 +12,12 @@ import time
 from customtkinter import CTk, StringVar, CTkFrame, CTkTextbox, CTkEntry, CTkButton, CTkLabel, CTkCheckBox, filedialog
 import threading
 import pyperclip as pc
+import ctypes
+
+try: # >= win 8.1
+    ctypes.windll.shcore.SetProcessDpiAwareness(2)
+except: # win 8.0 or less
+    ctypes.windll.user32.SetProcessDPIAware()
 
 # Create functions to handle the placeholder behavior
 def handle_phone_numbers(event):
@@ -79,32 +85,25 @@ def deleteChat(driver, num):
     # ensure that the chat to be deleted contains the same number on the top bar that should be deleted. Also, self chat should never be deleted
     receiver_number = num[-10:]
     receiver = "+91 " + receiver_number[0:5] + " " + receiver_number[5:]
-    # verify_receiver = driver.find_element(By.CSS_SELECTOR, "span[data-testid='conversation-info-header-chat-title']")
+    
     verify_receiver = driver.find_element(By.CSS_SELECTOR, "._amig ._aou8 .x1iyjqo2")
     if ((verify_receiver.text != receiver) or (receiver_number == (self_number.get())[-10:])) :
         return
 
     # click on delete chat option
-    driver.find_element(By.CSS_SELECTOR, "div[data-icon='menu']").click()
-    driver.find_element(By.CSS_SELECTOR, 0).click()
-
-    # click on continue button that appears sometimes
-    # WebDriverWait(driver, 300).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "button[data-testid='popup-controls-ok']")))
-    WebDriverWait(driver, 300).until(EC.visibility_of_element_located((By.CSS_SELECTOR, ".szmswy5k")))
-    continue_button = driver.find_element(By.CSS_SELECTOR, ".szmswy5k .gndfcl4n .gndfcl4n")
-    if (continue_button.text == "Continue"):
-        continue_button.click()
-        time.sleep(0.5)
+    driver.find_element(By.CSS_SELECTOR, "._amih ._ajv7").click()
+    WebDriverWait(driver, 300).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "div[aria-label='Delete chat']")))
+    driver.find_element(By.CSS_SELECTOR, "div[aria-label='Delete chat']").click()
 
     # click on delete chat button
     WebDriverWait(driver, 300).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "div[aria-label='Delete this chat?']")))
-    delete_chat_button = driver.find_element(By.CSS_SELECTOR, ".x1k3x3db .x1c4vz4f .x3pnbk8")
+    WebDriverWait(driver, 300).until(EC.visibility_of_element_located((By.XPATH, "//div[text()=\"Delete chat\"]")))
+    delete_chat_button = driver.find_element(By.XPATH, "//div[text()=\"Delete chat\"]")
     if(delete_chat_button.text == "Delete chat"):
         delete_chat_button.click()
-        WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.CLASS_NAME, '_al_c')))
+        WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.XPATH, "//div[text()=\"Make calls, share your screen and get a faster experience when you download the Windows app.\"]")))
     else:
-        # driver.find_element(By.CSS_SELECTOR, "button[data-testid='popup-controls-cancel']").click()
-        driver.find_element(By.CSS_SELECTOR, ".x1kwr8ib .x1c4vz4f .x3pnbk8").click()
+        driver.find_element(By.XPATH, "//div[text()=\"Cancel\"]").click()
     
 def sendMessage():
     if (phone_numbers_text.get("0.0", "end-1c") == phone_numbers_text_placeholder or len(phone_numbers_text.get("0.0", "end-1c")) == 0):
@@ -130,15 +129,18 @@ def sendMessage():
     # Message Text (not encoded)
     with open('message.txt', 'r') as file:
         msg = file.read()
+        pc.copy(msg)
 
     try:
         Driver.install_driver()
         driver = webdriver.Chrome()
         link = 'https://web.whatsapp.com'
         driver.get(link)
-        WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.CLASS_NAME, '_al_c')))
-    except:
-        # driver.quit()
+        WebDriverWait(driver, 300).until(EC.visibility_of_element_located((By.XPATH, "//div[text()=\"Make calls, share your screen and get a faster experience when you download the Windows app.\"]")))
+    except Exception as e:
+        print("[EXCEPTION IN DRIVER INSTALL]", e)
+        if (driver):
+            driver.quit()
         jobvar.set("Something unusual occurred. Retry!")
         send_message_button.configure(state="normal")
         return
@@ -148,8 +150,8 @@ def sendMessage():
     num = (self_number.get())[-10:]
     link = f'https://web.whatsapp.com/send/?phone=91{num}'
     driver.get(link)
-    # WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.CLASS_NAME, '_2au8k')))
-    WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.CSS_SELECTOR, "span[title='Message yourself']")))
+
+    WebDriverWait(driver, 300).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "span[title='Message yourself']")))
 
     time.sleep(action_time)
 
@@ -207,13 +209,14 @@ def sendMessage():
                 else:
                     WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.CSS_SELECTOR, "span[data-icon='smiley']")))
 
-
                 pc.copy(msg)
                 action_sendMessage = ActionChains(driver)
-                action_sendMessage.key_down(Keys.CONTROL).send_keys('v').key_up(Keys.CONTROL)
+                time.sleep(action_time)
+                driver.find_element(By.XPATH, f"//div[@title=\"Type a message\"]").click()
+                action_sendMessage.key_down(Keys.CONTROL).send_keys('v').key_up(Keys.CONTROL).perform()
                 action_sendMessage.send_keys(Keys.ENTER).perform()
                 
-                time.sleep(action_time)
+                time.sleep(action_time/2)
                 WebDriverWait(driver, 300).until_not(EC.presence_of_element_located((By.CSS_SELECTOR, "span[aria-label=' Pending ']")))
                 
                 s = s+1
@@ -224,18 +227,22 @@ def sendMessage():
                 if (deleteChat_checkbox.get()):
                     deleteChat(driver, num)
 
-            except:
+            except Exception as e:
+                print("[EXCEPTION] ", e)
                 jobvar.set(f"An error occured for {n.strip()}")
                 f = f+1
                 successvar.set(f"Success: {s}  |  Failure: {f}")
 
             finally:
                 try:
-                    driver.find_element(By.CSS_SELECTOR, ".xjuopq5.xulcptl._ao3e").click()
+                    driver.find_element(By.XPATH, "//span[text()=\"(You)\"]").click()
                     WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.CSS_SELECTOR, "span[title='Message yourself']")))
-                except:
+                except Exception as e:
+                    print("[EXCEPTION IN FINALLY BLOCK] ", e)
+                    jobvar.set("Ready")
                     driver.quit()
                     send_message_button.configure(state="normal")
+                    return
 
     # Quit the driver
     driver.quit()
