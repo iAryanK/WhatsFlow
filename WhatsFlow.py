@@ -12,12 +12,6 @@ import time
 from customtkinter import CTk, StringVar, CTkFrame, CTkTextbox, CTkEntry, CTkButton, CTkLabel, CTkCheckBox, filedialog
 import threading
 import pyperclip as pc
-import ctypes
-
-try: # >= win 8.1
-    ctypes.windll.shcore.SetProcessDpiAwareness(2)
-except: # win 8.0 or less
-    ctypes.windll.user32.SetProcessDPIAware()
 
 # Create functions to handle the placeholder behavior
 def handle_phone_numbers(event):
@@ -101,7 +95,7 @@ def deleteChat(driver, num):
     delete_chat_button = driver.find_element(By.XPATH, "//div[text()=\"Delete chat\"]")
     if(delete_chat_button.text == "Delete chat"):
         delete_chat_button.click()
-        WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.XPATH, "//div[text()=\"Make calls, share your screen and get a faster experience when you download the Windows app.\"]")))
+        WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.XPATH, "//span[@data-icon=\"lock-small\"]")))
     else:
         driver.find_element(By.XPATH, "//div[text()=\"Cancel\"]").click()
     
@@ -136,7 +130,7 @@ def sendMessage():
         driver = webdriver.Chrome()
         link = 'https://web.whatsapp.com'
         driver.get(link)
-        WebDriverWait(driver, 300).until(EC.visibility_of_element_located((By.XPATH, "//div[text()=\"Make calls, share your screen and get a faster experience when you download the Windows app.\"]")))
+        WebDriverWait(driver, 300).until(EC.visibility_of_element_located((By.XPATH, "//span[@data-icon=\"lock-small\"]")))
     except Exception as e:
         print("[EXCEPTION IN DRIVER INSTALL]", e)
         if (driver):
@@ -145,8 +139,9 @@ def sendMessage():
         send_message_button.configure(state="normal")
         return
 
-    time.sleep(action_time)
-
+    time.sleep(action_time*3)
+    
+    WebDriverWait(driver, 300).until(EC.visibility_of_element_located((By.XPATH, "//span[@data-icon=\"lock-small\"]")))
     num = (self_number.get())[-10:]
     link = f'https://web.whatsapp.com/send/?phone=91{num}'
     driver.get(link)
@@ -163,8 +158,10 @@ def sendMessage():
                 if (num == ""):
                     continue
                 action_sendNumber = ActionChains(driver)
-                action_sendNumber.send_keys(num)
-                action_sendNumber.send_keys(Keys.ENTER).perform()
+                action_sendNumber.send_keys(num).perform()
+                WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.XPATH, "//button[@aria-label=\"Send\"]")))
+                driver.find_element(By.XPATH, "//button[@aria-label=\"Send\"]").click()  # Raises exception if such link text not found.
+
 
                 WebDriverWait(driver, 300).until_not(EC.presence_of_element_located((By.CSS_SELECTOR, "span[aria-label=' Pending ']")))
                 driver.find_element("link text", f"{num}").click()  # Raises exception if such link text not found.
@@ -177,11 +174,11 @@ def sendMessage():
                     WebDriverWait(driver, 300).until_not(EC.presence_of_element_located((By.CSS_SELECTOR, "span[title='Message yourself']")))
 
                 # Wait for type message box to appear before start typing the message 
-                WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div[title='Type a message']")))
+                WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div[aria-label='Type a message']")))
 
                 # Click on button to load the input DOM
                 if doc_path.get() != doc_placeholder and len(doc_path.get()) != 0 :
-                    attach_btn = driver.find_element(By.CSS_SELECTOR, "span[data-icon='attach-menu-plus']")
+                    attach_btn = driver.find_element(By.CSS_SELECTOR, "span[data-icon='plus']")
                     attach_btn.click()
                     time.sleep(action_time)
                     # Find and send doc path to input
@@ -191,13 +188,13 @@ def sendMessage():
                     time.sleep(action_time)
                     # Start the action chain to write the message
                     action_sendDoc = ActionChains(driver)
-                    action_sendDoc.send_keys(Keys.ENTER)
-                    action_sendDoc.perform()
-                    WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.CSS_SELECTOR, "span[data-icon='emoji-input']")))
+
+                    WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.XPATH, "//span[@data-icon=\"send\"]")))
+                    driver.find_element(By.XPATH, "//span[@data-icon=\"send\"]").click()
 
                 # Click on button to load the input DOM
                 if image_path.get() != image_placeholder and len(image_path.get()) !=0 :
-                    attach_btn = driver.find_element(By.CSS_SELECTOR, "span[data-icon='attach-menu-plus']")
+                    attach_btn = driver.find_element(By.CSS_SELECTOR, "span[data-icon='plus']")
                     attach_btn.click()
                     time.sleep(action_time)
                     # Find and send image path to input
@@ -205,16 +202,25 @@ def sendMessage():
                     img_path = image_path.get().strip("\"")
                     msg_input.send_keys(img_path)
                     
-                    WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.CSS_SELECTOR, "span[data-icon='emoji-input']")))
+                    WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.CSS_SELECTOR, "span[data-icon='emoji-input']")))                    
                 else:
                     WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.CSS_SELECTOR, "span[data-icon='smiley']")))
 
                 pc.copy(msg)
                 action_sendMessage = ActionChains(driver)
                 time.sleep(action_time)
-                driver.find_element(By.XPATH, f"//div[@title=\"Type a message\"]").click()
+
+                if image_path.get() == image_placeholder and len(image_path.get()) ==0 :
+                    driver.find_element(By.XPATH, f"//div[@aria-label=\"Type a message\"]").click()
+
                 action_sendMessage.key_down(Keys.CONTROL).send_keys('v').key_up(Keys.CONTROL).perform()
-                action_sendMessage.send_keys(Keys.ENTER).perform()
+
+                if image_path.get() == image_placeholder and len(image_path.get()) ==0 :
+                    WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.XPATH, "//button[@aria-label=\"Send\"]")))
+                    driver.find_element(By.XPATH, "//button[@aria-label=\"Send\"]").click()
+                else:
+                    WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.XPATH, "//span[@data-icon=\"send\"]")))
+                    driver.find_element(By.XPATH, "//span[@data-icon=\"send\"]").click()
                 
                 time.sleep(action_time/2)
                 WebDriverWait(driver, 300).until_not(EC.presence_of_element_located((By.CSS_SELECTOR, "span[aria-label=' Pending ']")))
@@ -253,7 +259,7 @@ def connectMe():
     threading.Thread(target=sendMessage).start()
 
 root = CTk()
-root.title('WhatsFlow')
+root.title('WhatsFlow 6.6.1')
 root.geometry('800x450')
 root.iconbitmap('flowicon.ico')
 root.minsize(650,370)

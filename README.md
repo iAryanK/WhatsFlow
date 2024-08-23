@@ -17,7 +17,7 @@ A desktop application that sends bulk messages on whatsapp. WhatsFlow is a highl
 
 Download the latest software from here.
 
-[Download WhatsFlow v6.2.0](https://drive.google.com/drive/folders/1OHqlcki3WW0e82ftkBU7asfXW4tp69Ag?usp=sharing)
+[Download WhatsFlow v6.6.1](https://drive.google.com/drive/folders/1OHqlcki3WW0e82ftkBU7asfXW4tp69Ag?usp=sharing)
 | -------------------------- |
 
 ### Manual Installation
@@ -37,6 +37,10 @@ pip install cutomtkinter selenium webdriver-manager get-chrome-driver
 ```
 
 ## version updates
+
+v6.6.1
+
+- minor update due to changes in whatsapp web DOM
 
 v6.6.0 (only for windows 10 and 11)
 

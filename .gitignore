@@ -1,0 +1,8 @@
+/build
+/dist
+/__pycache__
+WhatsFlow.spec
+message.txt
+numbers.txt
+current_driver_version.txt
+chromedriver.exe
